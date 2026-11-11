@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="{{ asset('favicon.ico') }}?v=unsri" sizes="16x16 32x32 48x48">
     <meta name="theme-color" content="#0c2239">
     <title>@yield('title', 'Pengajuan Legalisir') | Universitas Sriwijaya</title>
     <link rel="stylesheet" href="{{ asset('legalisir.css') }}">
