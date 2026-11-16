@@ -14,6 +14,7 @@ Route::get('/cekstatus', [PengajuanController::class, 'status'])->name('pengajua
 Route::post('/cekstatus', [PengajuanController::class, 'cekStatus'])
     ->middleware('throttle:10,1,cek-status:')->name('pengajuan.cek-status');
 Route::get('/pengajuan/sukses', [PengajuanController::class, 'success'])->name('pengajuan.sukses');
+Route::get('/pengajuan/bukti', [PengajuanController::class, 'downloadReceipt'])->name('pengajuan.bukti');
 
 Route::redirect('/info-kampus', '/');
 Route::redirect('/lapor', '/pengajuan');

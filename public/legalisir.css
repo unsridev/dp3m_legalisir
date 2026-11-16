@@ -219,6 +219,7 @@ dl { margin: 0 0 1.5rem; }
 dd { margin: .2rem 0 0; overflow-wrap: anywhere; }
 .receipt dd { margin-bottom: 1rem; }
 .ticket { font-size: clamp(1.3rem, 4.5vw, 2rem); font-weight: 800; font-variant-numeric: tabular-nums; }
+.receipt-actions { display: flex; flex-wrap: wrap; gap: .55rem; }
 .badge { display: inline-block; padding: .25rem .6rem; border-radius: 2rem; background: #fff0c4; color: #684600; font-size: .83rem; font-weight: 700; white-space: nowrap; }
 .badge-diproses { background: #e2eeff; color: #204f85; }
 .badge-selesai { background: #e1f4e8; color: #1e6542; }

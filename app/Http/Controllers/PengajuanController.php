@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\JenisLayanan;
 use App\Models\Pengajuan;
+use Dompdf\Dompdf;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -179,12 +180,42 @@ class PengajuanController extends Controller
         return to_route('pengajuan.sukses')->with('nomor_antrean', $pengajuan->nomor_antrean);
     }
 
-    public function success(Request $request): View|RedirectResponse
+    public function success(Request $request): Response|RedirectResponse
+    {
+        $pengajuan = $this->receiptSubmission($request);
+
+        return $pengajuan
+            ? response()->view('info.sukses', compact('pengajuan'))->header('Cache-Control', 'private, no-store')
+            : to_route('home');
+    }
+
+    public function downloadReceipt(Request $request): Response
+    {
+        $pengajuan = $this->receiptSubmission($request);
+        abort_if($pengajuan === null, 404);
+
+        $pdf = new Dompdf;
+        $pdf->setPaper([0, 0, 297.64, 419.53]);
+        $pdf->loadHtml(view('info.bukti-pdf', compact('pengajuan'))->render(), 'UTF-8');
+        $pdf->render();
+
+        return response($pdf->output(), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="Bukti-Pengajuan-'.$pengajuan->nomor_antrean.'.pdf"',
+            'Cache-Control' => 'private, no-store',
+        ]);
+    }
+
+    private function receiptSubmission(Request $request): ?Pengajuan
     {
         $nomorAntrean = $request->session()->get('nomor_antrean');
 
-        return $nomorAntrean
-            ? view('info.sukses', compact('nomorAntrean'))
-            : to_route('home');
+        if ($nomorAntrean === null) {
+            return null;
+        }
+
+        $request->session()->keep('nomor_antrean');
+
+        return Pengajuan::with('jenisLayanan:id,nama')->where('nomor_antrean', $nomorAntrean)->first();
     }
 }

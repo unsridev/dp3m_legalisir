@@ -123,12 +123,28 @@ class PengajuanTest extends TestCase
         $akreditasi = JenisLayanan::where('kode', 'LA')->firstOrFail();
         $ijazah = JenisLayanan::factory()->create(['kode' => 'LI']);
 
+        $this->get(route('pengajuan.bukti', ['nomor_antrean' => 'LA202611100001']))->assertNotFound();
+
         $this->post(route('pengajuan.store'), $this->data($akreditasi))
             ->assertRedirectToRoute('pengajuan.sukses');
         $this->get(route('pengajuan.sukses'))
             ->assertOk()
             ->assertSee('LA202611100001')
-            ->assertSee('Dalam antrian');
+            ->assertSee('Dalam antrian')
+            ->assertSee('Unduh bukti PDF')
+            ->assertSee('Legalisir Akreditasi')
+            ->assertSee('10/11/2026 23:59')
+            ->assertSee('10/09/2026')
+            ->assertSee($this->data($akreditasi)['nama_lengkap'])
+            ->assertSee($this->data($akreditasi)['email'])
+            ->assertSee($this->data($akreditasi)['whatsapp'])
+            ->assertSee($this->data($akreditasi)['keperluan']);
+
+        $bukti = $this->get(route('pengajuan.bukti'))
+            ->assertOk()
+            ->assertHeader('Content-Type', 'application/pdf')
+            ->assertDownload('Bukti-Pengajuan-LA202611100001.pdf');
+        $this->assertStringStartsWith('%PDF-', $bukti->getContent());
 
         $this->post(route('pengajuan.store'), $this->data($akreditasi))
             ->assertSessionHas('nomor_antrean', 'LA202611100002');
